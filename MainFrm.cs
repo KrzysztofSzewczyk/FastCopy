@@ -18,8 +18,10 @@ namespace FastCopy
         static int error = 0;
         static int finished = 1;
         static int ioError = 0;
+        static int doCopy = 1;
+        static bool paused = false;
         static double bps = 0;
-        long[] sizes = {512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1024*1024, 1024*1024*2, 1024*1024*4, 1024*1024*8, 1024*1024*16, 1024*1024*32, 1024*1024*64};
+        long[] sizes = {512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1024*1024, 1024*1024*2, 1024*1024*4, 1024*1024*8, 1024*1024*16, 1024*1024*32, 1024*1024*64, 1024*1024*128};
 
         public FastCopy()
         {
@@ -99,6 +101,13 @@ namespace FastCopy
                     bps = (((double)((long)o.GetValue(2))) / seconds);
                     stopwatch.Reset();
                     stopwatch.Start();
+                    if (doCopy == 0)
+                    {
+                        finished = 0;
+                        buf = null;
+                        return;
+                    }
+                    while (paused) ;
                 }
                 stopwatch.Stop();
                 if (total != new FileInfo((string)o.GetValue(0)).Length)
@@ -129,6 +138,7 @@ namespace FastCopy
                 DestinatonPick.Enabled = false;
                 SourcePick.Enabled = false;
                 BufferSizeCombo.Enabled = false;
+                doCopy = 1;
                 string srcPath, destPath;
                 long bufferSize = sizes[BufferSizeCombo.SelectedIndex];
                 if (DirectoryChkbx.Checked)
@@ -270,6 +280,7 @@ namespace FastCopy
 
         private void StopBtn_Click(object sender, EventArgs e)
         {
+            doCopy = 0;
             RecursiveChkbx.Enabled = true;
             StartBtn.Enabled = true;
             PauseBtn.Enabled = false;
@@ -338,6 +349,11 @@ namespace FastCopy
             TotalProgress = 0;
             FileProgress = 0;
 
+        }
+
+        private void PauseBtn_Click(object sender, EventArgs e)
+        {
+            paused = !paused;
         }
     }
 }
