@@ -12,6 +12,9 @@ namespace FastCopy
         [STAThread]
         static void Main()
         {
+            System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
+            process.PriorityClass = System.Diagnostics.ProcessPriorityClass.High;
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FastCopy());

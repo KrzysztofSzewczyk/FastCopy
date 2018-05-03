@@ -122,7 +122,6 @@ namespace FastCopy
             // 
             // FilesList
             // 
-            this.FilesList.Enabled = false;
             this.FilesList.FormattingEnabled = true;
             this.FilesList.Items.AddRange(new object[] {
             ""});
