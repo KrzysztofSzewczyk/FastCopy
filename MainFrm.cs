@@ -81,24 +81,28 @@ namespace FastCopy
         private void CopyFile(object ow)
         {
             double seconds;
+            Array o = new object[3];
+            o = (Array)ow;
+
+            string src = (string)o.GetValue(0);
+            string dest = (string)o.GetValue(1);
+            long size = (long)o.GetValue(2);
             try
             {
-                Array o = new object[3];
-                o = (Array)ow;
-                long total = 0, current = 0, needed = new FileInfo((string)o.GetValue(0)).Length;
-                byte[] buf = new byte[(long)o.GetValue(2)];
-                FileStream f = File.Open((string)o.GetValue(0), FileMode.Open);
-                FileStream g = File.OpenWrite((string)o.GetValue(1));
+                long total = 0, current = 0, needed = new FileInfo(src).Length;
+                byte[] buf = new byte[size];
+                FileStream f = File.Open(src, FileMode.Open);
+                FileStream g = File.OpenWrite(dest);
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 for (; ; )
                 {
-                    current = f.Read(buf, 0, (int)((long)o.GetValue(2)));
+                    current = f.Read(buf, 0, (int)size);
                     total += current;
                     if (current == 0) break;
-                    g.Write(buf, 0, (int)((long)o.GetValue(2)));
+                    g.Write(buf, 0, (int)size);
                     FastCopy.FileProgress = (int)((total * 100) / needed);
                     seconds = (((stopwatch.ElapsedMilliseconds + 1) / 1000) + 1);
-                    bps = (((double)((long)o.GetValue(2))) / seconds);
+                    bps = (double)size / seconds;
                     stopwatch.Reset();
                     stopwatch.Start();
                     if (doCopy == 0)
