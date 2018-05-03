@@ -52,6 +52,7 @@ namespace FastCopy
             this.ProgressbarUpdateTick = new System.Windows.Forms.Timer(this.components);
             this.CleanBtn = new System.Windows.Forms.Button();
             this.speedLbl = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // SourceLbl
@@ -248,11 +249,21 @@ namespace FastCopy
             this.speedLbl.Size = new System.Drawing.Size(0, 13);
             this.speedLbl.TabIndex = 16;
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(12, 289);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(237, 13);
+            this.label2.TabIndex = 17;
+            this.label2.Text = "Made by Krzysztof Szewczyk. Copyright (C) 2018";
+            // 
             // FastCopy
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(334, 301);
+            this.ClientSize = new System.Drawing.Size(334, 311);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.speedLbl);
             this.Controls.Add(this.CleanBtn);
             this.Controls.Add(this.BufferSizeCombo);
@@ -271,8 +282,8 @@ namespace FastCopy
             this.Controls.Add(this.SourceFileLbl);
             this.Controls.Add(this.SourceLbl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximumSize = new System.Drawing.Size(350, 340);
-            this.MinimumSize = new System.Drawing.Size(350, 340);
+            this.MaximumSize = new System.Drawing.Size(350, 350);
+            this.MinimumSize = new System.Drawing.Size(350, 350);
             this.Name = "FastCopy";
             this.Text = "FastCopy";
             this.ResumeLayout(false);
@@ -304,6 +315,7 @@ namespace FastCopy
         private System.Windows.Forms.Timer ProgressbarUpdateTick;
         private System.Windows.Forms.Button CleanBtn;
         private System.Windows.Forms.Label speedLbl;
+        private System.Windows.Forms.Label label2;
     }
 }
 
