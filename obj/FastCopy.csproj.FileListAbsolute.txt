@@ -6,3 +6,8 @@ C:\Users\PC\Desktop\FastCopy\obj\Release\FastCopy.Properties.Resources.resources
 C:\Users\PC\Desktop\FastCopy\obj\Release\FastCopy.csproj.GenerateResource.Cache
 C:\Users\PC\Desktop\FastCopy\obj\Release\FastCopy.exe
 C:\Users\PC\Desktop\FastCopy\obj\Release\FastCopy.pdb
+C:\Users\PC\Desktop\FastCopy\bin\Release\FastCopy.exe.manifest
+C:\Users\PC\Desktop\FastCopy\bin\Release\FastCopy.application
+C:\Users\PC\Desktop\FastCopy\obj\Release\FastCopy.TrustInfo.xml
+C:\Users\PC\Desktop\FastCopy\obj\Release\FastCopy.exe.manifest
+C:\Users\PC\Desktop\FastCopy\obj\Release\FastCopy.application
