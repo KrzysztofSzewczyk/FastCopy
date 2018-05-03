@@ -51,8 +51,6 @@ namespace FastCopy
             string sourceFolder, destFolder;
             int SelIndex;
 
-            byte[] buffer = new byte[sizes[SelIndex]];
-
             Array o = new object[3];
             o = (Array)param;
 
@@ -60,13 +58,27 @@ namespace FastCopy
             destFolder = (string)o.GetValue(1);
             SelIndex = (int)o.GetValue(2);
 
-            foreach (string dir in Directory.GetDirectories(sourceFolder, "*", SearchOption.AllDirectories)) {
+            byte[] buffer = new byte[sizes[SelIndex]];
+
+            int max = Directory.GetFiles(sourceFolder, "*", SearchOption.AllDirectories).Length;
+            int cur = 0;
+
+            foreach (string dir in Directory.GetDirectories(sourceFolder, "*", SearchOption.AllDirectories))
+            {
                 Directory.CreateDirectory(destFolder + dir.Substring(sourceFolder.Length));
+
+                this.Invoke(new MethodInvoker(delegate()
+                {
+                    FilesList.Items.Add("Create: " + destFolder + dir.Substring(sourceFolder.Length));
+                }));
             }
 
-            foreach (string file_name in Directory.GetFiles(sourceFolder, "*.*", SearchOption.AllDirectories)) {
+            foreach (string file_name in Directory.GetFiles(sourceFolder, "*.*", SearchOption.AllDirectories))
+            {
+                TotalProgress = (cur * 100) / (max + 1);
+
                 Thread newThread = new Thread(CopyFileProvBuffer);
-                object args = new object[3] { file_name, destFolder + file_name.Substring(sourceFolder.Length), sizes[SelIndex] };
+                object args = new object[4] { file_name, destFolder + file_name.Substring(sourceFolder.Length), sizes[SelIndex], buffer };
                 newThread.Start(args);
                 if (error == 1)
                 {
@@ -77,8 +89,10 @@ namespace FastCopy
 
                 this.Invoke(new MethodInvoker(delegate()
                 {
-                    FilesList.Items.Add(file_name);
+                    FilesList.Items.Add("Copy: " + file_name);
                 }));
+
+                cur++;
             }
         }
 
@@ -98,6 +112,61 @@ namespace FastCopy
             {
                 long total = 0, current = 0, needed = new FileInfo(src).Length;
                 byte[] buf = new byte[size];
+                FileStream f = File.Open(src, FileMode.Open);
+                FileStream g = File.OpenWrite(dest);
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                for (; ; )
+                {
+                    current = f.Read(buf, 0, (int)size);
+                    total += current;
+                    if (current == 0) break;
+                    g.Write(buf, 0, (int)current);
+                    FastCopy.FileProgress = (int)((total * 100) / needed);
+                    seconds = (((stopwatch.ElapsedMilliseconds + 1) / 1000) + 1);
+                    bps = (double)size / seconds;
+                    stopwatch.Reset();
+                    stopwatch.Start();
+                    if (doCopy == 0)
+                    {
+                        MessageBox.Show(this, "Copy failed. Size mismatch!", "Error!");
+                        finished = 0;
+                        buf = null;
+                        return;
+                    }
+                    while (paused) ;
+                }
+                stopwatch.Stop();
+                if (total != new FileInfo((string)o.GetValue(0)).Length)
+                {
+                    error = 1;
+                }
+                f.Close();
+                g.Close();
+                buf = null;
+                finished = 0;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error: " + e.Message);
+            }
+        }
+
+        private void CopyFileProvBuffer(object ow)
+        {
+            Thread thread = System.Threading.Thread.CurrentThread;
+            thread.Priority = ThreadPriority.Highest;
+
+            double seconds;
+            Array o = new object[4];
+            o = (Array)ow;
+
+            string src = (string)o.GetValue(0);
+            string dest = (string)o.GetValue(1);
+            long size = (long)o.GetValue(2);
+            try
+            {
+                long total = 0, current = 0, needed = new FileInfo(src).Length;
+                byte[] buf = (byte[])o.GetValue(3);
                 FileStream f = File.Open(src, FileMode.Open);
                 FileStream g = File.OpenWrite(dest);
                 Stopwatch stopwatch = Stopwatch.StartNew();
@@ -185,6 +254,8 @@ namespace FastCopy
                     }
                     else
                     {
+                        byte[] buf = new byte[bufferSize];
+
                         FileInfo[] Files = null;
                         try
                         {
@@ -201,8 +272,8 @@ namespace FastCopy
 
                         foreach (FileInfo file in Files)
                         {
-                                Thread newThread = new Thread(CopyFile);
-                                object args = new object[3] { srcPath + "\\" + file.Name, destPath + "\\" + file.Name, bufferSize };
+                                Thread newThread = new Thread(CopyFileProvBuffer);
+                                object args = new object[4] { srcPath + "\\" + file.Name, destPath + "\\" + file.Name, bufferSize, buf };
                                 newThread.Start(args);
                                 if (error == 1)
                                 {
@@ -213,7 +284,7 @@ namespace FastCopy
                                 FastCopy.TotalProgress = (currentAmount * 100) / amount;
                                 FilesList.Items.Add(srcPath + "\\" + file.Name);
                                 doCopy = 1;
-                            currentAmount++;
+                                currentAmount++;
                         }
                     }
                 }
