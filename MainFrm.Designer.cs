@@ -165,6 +165,7 @@ namespace FastCopy
             this.PauseBtn.TabIndex = 11;
             this.PauseBtn.Text = "Pause";
             this.PauseBtn.UseVisualStyleBackColor = true;
+            this.PauseBtn.Click += new System.EventHandler(this.PauseBtn_Click);
             // 
             // StopBtn
             // 
@@ -218,7 +219,9 @@ namespace FastCopy
             "4 MB",
             "8 MB",
             "16 MB",
-            "32 MB"});
+            "32 MB",
+            "64 MB",
+            "128 MB"});
             this.BufferSizeCombo.Location = new System.Drawing.Point(15, 244);
             this.BufferSizeCombo.Name = "BufferSizeCombo";
             this.BufferSizeCombo.Size = new System.Drawing.Size(307, 21);
