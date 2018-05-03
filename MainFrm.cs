@@ -51,6 +51,8 @@ namespace FastCopy
             string sourceFolder, destFolder;
             int SelIndex;
 
+            byte[] buffer = new byte[sizes[SelIndex]];
+
             Array o = new object[3];
             o = (Array)param;
 
@@ -58,17 +60,13 @@ namespace FastCopy
             destFolder = (string)o.GetValue(1);
             SelIndex = (int)o.GetValue(2);
 
-            long bufferSize = sizes[SelIndex];
-            if (!Directory.Exists(destFolder))
-                Directory.CreateDirectory(destFolder);
-            int current = 0, amount = AmountDirectories(sourceFolder);
-            string[] files = Directory.GetFiles(sourceFolder);
-            foreach (string file in files)
-            {
-                string name = Path.GetFileName(file);
-                string dest = Path.Combine(destFolder, name);
-                Thread newThread = new Thread(CopyFile);
-                object args = new object[3] { file, dest, bufferSize };
+            foreach (string dir in Directory.GetDirectories(sourceFolder, "*", SearchOption.AllDirectories)) {
+                Directory.CreateDirectory(destFolder + dir.Substring(sourceFolder.Length));
+            }
+
+            foreach (string file_name in Directory.GetFiles(sourceFolder, "*.*", SearchOption.AllDirectories)) {
+                Thread newThread = new Thread(CopyFileProvBuffer);
+                object args = new object[3] { file_name, destFolder + file_name.Substring(sourceFolder.Length), sizes[SelIndex] };
                 newThread.Start(args);
                 if (error == 1)
                 {
@@ -76,15 +74,11 @@ namespace FastCopy
                     error = 0;
                     return;
                 }
-                FastCopy.TotalProgress = (current * 100) / amount;
-                FilesList.Items.Add(name);
-            }
-            string[] folders = Directory.GetDirectories(sourceFolder);
-            foreach (string folder in folders)
-            {
-                string name = Path.GetFileName(folder);
-                string dest = Path.Combine(destFolder, name);
-                CopyFolder(new object[3] { name, dest, SelIndex });
+
+                this.Invoke(new MethodInvoker(delegate()
+                {
+                    FilesList.Items.Add(file_name);
+                }));
             }
         }
 
