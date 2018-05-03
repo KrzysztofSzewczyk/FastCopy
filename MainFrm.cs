@@ -46,9 +46,19 @@ namespace FastCopy
             }
         }
 
-        private void CopyFolder(string sourceFolder, string destFolder)
+        private void CopyFolder(object param)
         {
-            long bufferSize = sizes[BufferSizeCombo.SelectedIndex];
+            string sourceFolder, destFolder;
+            int SelIndex;
+
+            Array o = new object[3];
+            o = (Array)param;
+
+            sourceFolder = (string)o.GetValue(0);
+            destFolder = (string)o.GetValue(1);
+            SelIndex = (int)o.GetValue(2);
+
+            long bufferSize = sizes[SelIndex];
             if (!Directory.Exists(destFolder))
                 Directory.CreateDirectory(destFolder);
             int current = 0, amount = AmountDirectories(sourceFolder);
@@ -74,12 +84,15 @@ namespace FastCopy
             {
                 string name = Path.GetFileName(folder);
                 string dest = Path.Combine(destFolder, name);
-                CopyFolder(folder, dest);
+                CopyFolder(new object[3] { name, dest, SelIndex });
             }
         }
 
         private void CopyFile(object ow)
         {
+            Thread thread = System.Threading.Thread.CurrentThread;
+            thread.Priority = ThreadPriority.Highest;
+
             double seconds;
             Array o = new object[3];
             o = (Array)ow;
@@ -99,7 +112,7 @@ namespace FastCopy
                     current = f.Read(buf, 0, (int)size);
                     total += current;
                     if (current == 0) break;
-                    g.Write(buf, 0, (int)size);
+                    g.Write(buf, 0, (int)current);
                     FastCopy.FileProgress = (int)((total * 100) / needed);
                     seconds = (((stopwatch.ElapsedMilliseconds + 1) / 1000) + 1);
                     bps = (double)size / seconds;
@@ -107,6 +120,7 @@ namespace FastCopy
                     stopwatch.Start();
                     if (doCopy == 0)
                     {
+                        MessageBox.Show(this, "Copy failed. Size mismatch!", "Error!");
                         finished = 0;
                         buf = null;
                         return;
@@ -125,8 +139,7 @@ namespace FastCopy
             }
             catch (Exception e)
             {
-                ioError = 1;
-                MessageBox.Show(e.Message);
+                MessageBox.Show("Error: " + e.Message);
             }
         }
 
@@ -158,7 +171,7 @@ namespace FastCopy
                 if (srcPath.Equals("") || destPath.Equals(""))
                 {
                     MessageBox.Show(this, "Please choose valid destination and source file / directory.", "Error");
-                    StopBtn_Click(sender, e);
+                    ResetControls(null, null);
                     return;
                 }
                 if (srcPath.Equals(destPath))
@@ -166,13 +179,15 @@ namespace FastCopy
                     FilesList.Items.Add(srcPath);
                     FileProgressbar.Value = 100;
                     TotalProgressbar.Value = 100;
-                    StopBtn_Click(null, null);
+                    ResetControls(null, null);
                 }
                 if (DirectoryChkbx.Checked)
                 {
                     if (RecursiveChkbx.Checked)
                     {
-                        CopyFolder(srcPath, destPath);
+                        Thread newThread = new Thread(CopyFolder);
+                        object args = new object[3] { srcPath, destPath, BufferSizeCombo.SelectedIndex };
+                        newThread.Start(args);
                     }
                     else
                     {
@@ -184,18 +199,16 @@ namespace FastCopy
                         catch (Exception)
                         {
                             MessageBox.Show(this, "Could not read directory: " + srcPath, "Error");
-                            StopBtn_Click(sender, e);
+                            ResetControls(null, null);
                             return;
                         }
 
-                        int current = 0, amount = Files.Length;
+                        int currentAmount = 0, amount = Files.Length;
 
                         foreach (FileInfo file in Files)
                         {
-                            if (new FileInfo(srcPath).Exists)
-                            {
                                 Thread newThread = new Thread(CopyFile);
-                                object args = new object[3] { srcPath + file.Name, destPath + file.Name, bufferSize };
+                                object args = new object[3] { srcPath + "\\" + file.Name, destPath + "\\" + file.Name, bufferSize };
                                 newThread.Start(args);
                                 if (error == 1)
                                 {
@@ -203,16 +216,10 @@ namespace FastCopy
                                     error = 0;
                                     return;
                                 }
-                                FastCopy.TotalProgress = (current * 100) / amount;
-                                FilesList.Items.Add(srcPath);
-                            }
-                            else
-                            {
-                                MessageBox.Show(this, "Please choose valid destination and source file / directory.", "Error");
-                                StopBtn_Click(sender, e);
-                                return;
-                            }
-                            current++;
+                                FastCopy.TotalProgress = (currentAmount * 100) / amount;
+                                FilesList.Items.Add(srcPath + "\\" + file.Name);
+                                doCopy = 1;
+                            currentAmount++;
                         }
                     }
                 }
@@ -235,15 +242,15 @@ namespace FastCopy
                     else
                     {
                         MessageBox.Show(this, "Please choose valid destination and source file / directory.", "Error");
-                        StopBtn_Click(sender, e);
+                        ResetControls(null, null);
                         return;
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                MessageBox.Show(this, "Copy error.", "Error");
-                StopBtn_Click(sender, e);
+                MessageBox.Show(this, "Copy error: " + ex.Message, "Error");
+                ResetControls(null, null);
                 return;
             }
         }
@@ -282,6 +289,17 @@ namespace FastCopy
             }
         }
 
+        private void ResetControls(object sender, EventArgs e)
+        {
+            RecursiveChkbx.Enabled = true;
+            StartBtn.Enabled = true;
+            PauseBtn.Enabled = false;
+            StopBtn.Enabled = false;
+            DestinatonPick.Enabled = true;
+            SourcePick.Enabled = true;
+            BufferSizeCombo.Enabled = true;
+        }
+
         private void StopBtn_Click(object sender, EventArgs e)
         {
             doCopy = 0;
@@ -312,14 +330,14 @@ namespace FastCopy
             TotalProgressbar.Value = FastCopy.TotalProgress;
             if (finished == 0)
             {
-                StopBtn_Click(sender, e);
+                ResetControls(null, null);
                 finished = 1;
             }
             if (ioError == 1)
             {
                 ioError = 0;
                 MessageBox.Show(this, "I/O error.", "Error");
-                StopBtn_Click(sender, e);
+                ResetControls(null, null);
             }
             if (bps < 1000)
             {
