@@ -225,6 +225,17 @@ namespace FastCopy
 
         private void StartBtn_Click(object sender, EventArgs e)
         {
+            if (ElevatePriorityChkbx.Checked)
+            {
+                System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
+                process.PriorityClass = System.Diagnostics.ProcessPriorityClass.High;
+            }
+            else
+            {
+                System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
+                process.PriorityClass = System.Diagnostics.ProcessPriorityClass.Normal;
+            }
+
             try
             {
                 RecursiveChkbx.Enabled = false;
@@ -269,7 +280,6 @@ namespace FastCopy
                         Thread newThread = new Thread(CopyFolder);
                         object args = new object[3] { srcPath, destPath, BufferSizeCombo.SelectedIndex };
                         newThread.Start(args);
-                        newThread.Join();
                     }
                     else
                     {
@@ -294,7 +304,6 @@ namespace FastCopy
                                 Thread newThread = new Thread(CopyFileProvBuffer);
                                 object args = new object[4] { srcPath + "\\" + file.Name, destPath + "\\" + file.Name, bufferSize, buf };
                                 newThread.Start(args);
-                                newThread.Join();
                                 if (error == 1)
                                 {
                                     ErrorLbl.Text = "Error: Copy failed. Size mismatch!";
@@ -315,7 +324,6 @@ namespace FastCopy
                         Thread newThread = new Thread(CopyFile);
                         object args = new object[3] { srcPath, destPath, bufferSize };
                         newThread.Start(args);
-                        newThread.Join();
                         if (error == 1)
                         {
                             ErrorLbl.Text = "Error: Copy failed. Size mismatch!";
@@ -439,8 +447,6 @@ namespace FastCopy
             {
                 speedLbl.Text = "Speed: " + bps / 1000000 + " MBPS";
             }
-
-            GC.GetTotalMemory(true);
         }
 
         private void CleanBtn_Click(object sender, EventArgs e)
@@ -471,17 +477,11 @@ namespace FastCopy
 
         private void ElevatePriorityChkbx_CheckedChanged(object sender, EventArgs e)
         {
-            if(ElevatePriorityChkbx.Checked)
-            {
-                System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
-                process.PriorityClass = System.Diagnostics.ProcessPriorityClass.Normal;
-            }
-            else
-            {
-                System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
-                process.PriorityClass = System.Diagnostics.ProcessPriorityClass.High;
-            }
-            
+        }
+
+        private void GCTask_Tick(object sender, EventArgs e)
+        {
+            GC.GetTotalMemory(true);
         }
     }
 }
