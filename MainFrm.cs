@@ -80,9 +80,13 @@ namespace FastCopy
                 Thread newThread = new Thread(CopyFileProvBuffer);
                 object args = new object[4] { file_name, destFolder + file_name.Substring(sourceFolder.Length), sizes[SelIndex], buffer };
                 newThread.Start(args);
+                newThread.Join();
                 if (error == 1)
                 {
-                    MessageBox.Show(this, "Copy failed. Size mismatch!", "Error!");
+                    this.Invoke(new MethodInvoker(delegate ()
+                    {
+                        ErrorLbl.Text = "Error: Copy failed. Size mismatch!";
+                    }));
                     error = 0;
                     return;
                 }
@@ -94,6 +98,8 @@ namespace FastCopy
 
                 cur++;
             }
+
+            finished = 0;
         }
 
         private void CopyFile(object ow)
@@ -128,7 +134,10 @@ namespace FastCopy
                     stopwatch.Start();
                     if (doCopy == 0)
                     {
-                        MessageBox.Show(this, "Copy failed. Size mismatch!", "Error!");
+                        this.Invoke(new MethodInvoker(delegate ()
+                        {
+                            ErrorLbl.Text = "Error: Copy failed. Size mismatch!";
+                        }));
                         finished = 0;
                         buf = null;
                         return;
@@ -147,7 +156,10 @@ namespace FastCopy
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error: " + e.Message);
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+                    ErrorLbl.Text = "Error: " + e.Message;
+                }));
             }
         }
 
@@ -183,8 +195,10 @@ namespace FastCopy
                     stopwatch.Start();
                     if (doCopy == 0)
                     {
-                        MessageBox.Show(this, "Copy failed. Size mismatch!", "Error!");
-                        finished = 0;
+                        this.Invoke(new MethodInvoker(delegate ()
+                        {
+                            ErrorLbl.Text = "Error: Copy failed. Size mismatch!";
+                        }));
                         buf = null;
                         return;
                     }
@@ -202,7 +216,10 @@ namespace FastCopy
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error: " + e.Message);
+                this.Invoke(new MethodInvoker(delegate ()
+                {
+                    ErrorLbl.Text = "Error: " + e.Message;
+                }));
             }
         }
 
@@ -218,6 +235,7 @@ namespace FastCopy
                 DestinatonPick.Enabled = false;
                 SourcePick.Enabled = false;
                 BufferSizeCombo.Enabled = false;
+                ElevatePriorityChkbx.Enabled = false;
                 doCopy = 1;
                 string srcPath, destPath;
                 long bufferSize = sizes[BufferSizeCombo.SelectedIndex];
@@ -233,7 +251,7 @@ namespace FastCopy
                 }
                 if (srcPath.Equals("") || destPath.Equals(""))
                 {
-                    MessageBox.Show(this, "Please choose valid destination and source file / directory.", "Error");
+                    ErrorLbl.Text = "Error: Please choose valid destination and source file / directory.";
                     ResetControls(null, null);
                     return;
                 }
@@ -251,6 +269,7 @@ namespace FastCopy
                         Thread newThread = new Thread(CopyFolder);
                         object args = new object[3] { srcPath, destPath, BufferSizeCombo.SelectedIndex };
                         newThread.Start(args);
+                        newThread.Join();
                     }
                     else
                     {
@@ -263,7 +282,7 @@ namespace FastCopy
                         }
                         catch (Exception)
                         {
-                            MessageBox.Show(this, "Could not read directory: " + srcPath, "Error");
+                            ErrorLbl.Text = "Error: Could not read directory: " + srcPath;
                             ResetControls(null, null);
                             return;
                         }
@@ -275,9 +294,10 @@ namespace FastCopy
                                 Thread newThread = new Thread(CopyFileProvBuffer);
                                 object args = new object[4] { srcPath + "\\" + file.Name, destPath + "\\" + file.Name, bufferSize, buf };
                                 newThread.Start(args);
+                                newThread.Join();
                                 if (error == 1)
                                 {
-                                    MessageBox.Show(this, "Copy failed. Size mismatch!", "Error!");
+                                    ErrorLbl.Text = "Error: Copy failed. Size mismatch!";
                                     error = 0;
                                     return;
                                 }
@@ -295,9 +315,10 @@ namespace FastCopy
                         Thread newThread = new Thread(CopyFile);
                         object args = new object[3] { srcPath, destPath, bufferSize };
                         newThread.Start(args);
+                        newThread.Join();
                         if (error == 1)
                         {
-                            MessageBox.Show(this, "Copy failed. Size mismatch!", "Error!");
+                            ErrorLbl.Text = "Error: Copy failed. Size mismatch!";
                             error = 0;
                             return;
                         }
@@ -306,7 +327,7 @@ namespace FastCopy
                     }
                     else
                     {
-                        MessageBox.Show(this, "Please choose valid destination and source file / directory.", "Error");
+                        ErrorLbl.Text = "Error: Please choose valid destination and source file / directory.";
                         ResetControls(null, null);
                         return;
                     }
@@ -314,7 +335,7 @@ namespace FastCopy
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, "Copy error: " + ex.Message, "Error");
+                ErrorLbl.Text = "Error: Copy error: " + ex.Message;
                 ResetControls(null, null);
                 return;
             }
@@ -356,6 +377,7 @@ namespace FastCopy
 
         private void ResetControls(object sender, EventArgs e)
         {
+            ElevatePriorityChkbx.Enabled = true;
             RecursiveChkbx.Enabled = true;
             StartBtn.Enabled = true;
             PauseBtn.Enabled = false;
@@ -367,6 +389,7 @@ namespace FastCopy
 
         private void StopBtn_Click(object sender, EventArgs e)
         {
+            ElevatePriorityChkbx.Enabled = true;
             doCopy = 0;
             RecursiveChkbx.Enabled = true;
             StartBtn.Enabled = true;
@@ -401,7 +424,7 @@ namespace FastCopy
             if (ioError == 1)
             {
                 ioError = 0;
-                MessageBox.Show(this, "I/O error.", "Error");
+                ErrorLbl.Text = "I/O error.";
                 ResetControls(null, null);
             }
             if (bps < 1000)
@@ -416,12 +439,15 @@ namespace FastCopy
             {
                 speedLbl.Text = "Speed: " + bps / 1000000 + " MBPS";
             }
+
+            GC.GetTotalMemory(true);
         }
 
         private void CleanBtn_Click(object sender, EventArgs e)
         {
             DirectoryChkbx.Enabled = true;
             RecursiveChkbx.Enabled = true;
+            ElevatePriorityChkbx.Enabled = true;
             BufferSizeCombo.SelectedIndex = -1;
             RecursiveChkbx.Checked = false;
             DirectoryChkbx.Checked = false;
@@ -441,6 +467,21 @@ namespace FastCopy
         private void PauseBtn_Click(object sender, EventArgs e)
         {
             paused = !paused;
+        }
+
+        private void ElevatePriorityChkbx_CheckedChanged(object sender, EventArgs e)
+        {
+            if(ElevatePriorityChkbx.Checked)
+            {
+                System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
+                process.PriorityClass = System.Diagnostics.ProcessPriorityClass.Normal;
+            }
+            else
+            {
+                System.Diagnostics.Process process = System.Diagnostics.Process.GetCurrentProcess();
+                process.PriorityClass = System.Diagnostics.ProcessPriorityClass.High;
+            }
+            
         }
     }
 }
