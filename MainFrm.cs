@@ -80,7 +80,6 @@ namespace FastCopy
                 Thread newThread = new Thread(CopyFileProvBuffer);
                 object args = new object[4] { file_name, destFolder + file_name.Substring(sourceFolder.Length), sizes[SelIndex], buffer };
                 newThread.Start(args);
-                newThread.Join();
                 if (error == 1)
                 {
                     this.Invoke(new MethodInvoker(delegate ()
