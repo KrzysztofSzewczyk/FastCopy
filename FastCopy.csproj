@@ -10,13 +10,13 @@
     <RootNamespace>FastCopy</RootNamespace>
     <AssemblyName>FastCopy</AssemblyName>
     <ApplicationIcon>directory_folder_options.ico</ApplicationIcon>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
     <TargetZone>Custom</TargetZone>
-    <GenerateManifests>true</GenerateManifests>
+    <GenerateManifests>false</GenerateManifests>
     <ExcludedPermissions>
     </ExcludedPermissions>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
