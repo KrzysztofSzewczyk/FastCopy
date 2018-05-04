@@ -1,6 +1,7 @@
 
 # FastCopy
 
+[![Build Status](https://travis-ci.org/KrzysztofSzewczyk/FastCopy.svg?branch=master)](https://travis-ci.org/KrzysztofSzewczyk/FastCopy)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 FastCopy is propably the fastest copy utility made in pure C#. Useful links:
