@@ -53,6 +53,8 @@ namespace FastCopy
             this.CleanBtn = new System.Windows.Forms.Button();
             this.speedLbl = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.ElevatePriorityChkbx = new System.Windows.Forms.CheckBox();
+            this.ErrorLbl = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // SourceLbl
@@ -260,11 +262,32 @@ namespace FastCopy
             this.label2.TabIndex = 17;
             this.label2.Text = "Made by Kamila Szewczyk. Copyright (C) 2018";
             // 
+            // ElevatePriorityChkbx
+            // 
+            this.ElevatePriorityChkbx.AutoSize = true;
+            this.ElevatePriorityChkbx.Location = new System.Drawing.Point(166, 58);
+            this.ElevatePriorityChkbx.Name = "ElevatePriorityChkbx";
+            this.ElevatePriorityChkbx.Size = new System.Drawing.Size(170, 17);
+            this.ElevatePriorityChkbx.TabIndex = 18;
+            this.ElevatePriorityChkbx.Text = "Elevate IO priority (faster copy)";
+            this.ElevatePriorityChkbx.UseVisualStyleBackColor = true;
+            this.ElevatePriorityChkbx.CheckedChanged += new System.EventHandler(this.ElevatePriorityChkbx_CheckedChanged);
+            // 
+            // ErrorLbl
+            // 
+            this.ErrorLbl.AutoSize = true;
+            this.ErrorLbl.Location = new System.Drawing.Point(14, 314);
+            this.ErrorLbl.Name = "ErrorLbl";
+            this.ErrorLbl.Size = new System.Drawing.Size(0, 13);
+            this.ErrorLbl.TabIndex = 19;
+            // 
             // FastCopy
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(334, 311);
+            this.ClientSize = new System.Drawing.Size(334, 331);
+            this.Controls.Add(this.ErrorLbl);
+            this.Controls.Add(this.ElevatePriorityChkbx);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.speedLbl);
             this.Controls.Add(this.CleanBtn);
@@ -284,8 +307,8 @@ namespace FastCopy
             this.Controls.Add(this.SourceFileLbl);
             this.Controls.Add(this.SourceLbl);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximumSize = new System.Drawing.Size(350, 350);
-            this.MinimumSize = new System.Drawing.Size(350, 350);
+            this.MaximumSize = new System.Drawing.Size(350, 370);
+            this.MinimumSize = new System.Drawing.Size(350, 370);
             this.Name = "FastCopy";
             this.Text = "FastCopy";
             this.ResumeLayout(false);
@@ -318,6 +341,8 @@ namespace FastCopy
         private System.Windows.Forms.Button CleanBtn;
         private System.Windows.Forms.Label speedLbl;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.CheckBox ElevatePriorityChkbx;
+        private System.Windows.Forms.Label ErrorLbl;
     }
 }
 
