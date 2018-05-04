@@ -55,6 +55,7 @@ namespace FastCopy
             this.label2 = new System.Windows.Forms.Label();
             this.ElevatePriorityChkbx = new System.Windows.Forms.CheckBox();
             this.ErrorLbl = new System.Windows.Forms.Label();
+            this.GCTask = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // SourceLbl
@@ -281,6 +282,12 @@ namespace FastCopy
             this.ErrorLbl.Size = new System.Drawing.Size(0, 13);
             this.ErrorLbl.TabIndex = 19;
             // 
+            // GCTask
+            // 
+            this.GCTask.Enabled = true;
+            this.GCTask.Interval = 10000;
+            this.GCTask.Tick += new System.EventHandler(this.GCTask_Tick);
+            // 
             // FastCopy
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -343,6 +350,7 @@ namespace FastCopy
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox ElevatePriorityChkbx;
         private System.Windows.Forms.Label ErrorLbl;
+        private System.Windows.Forms.Timer GCTask;
     }
 }
 
