@@ -223,7 +223,8 @@ namespace FastCopy
             "16 MB",
             "32 MB",
             "64 MB",
-            "128 MB"});
+            "128 MB",
+            "256 MB"});
             this.BufferSizeCombo.Location = new System.Drawing.Point(15, 244);
             this.BufferSizeCombo.Name = "BufferSizeCombo";
             this.BufferSizeCombo.Size = new System.Drawing.Size(307, 21);
