@@ -79,4 +79,4 @@ means, useless code that author meant to be not-free.
 
 ## Misc
 
-This project is my attempt to create useful too. I accidentally, CPU benchmarking tool. Such project would be useful for me. I have to copy something everytime, and it's best solution in my opinion.
+This project is my attempt to create useful tool. I accidentally, CPU benchmarking tool. Such project would be useful for me. I have to copy something everytime, and it's best solution in my opinion.
